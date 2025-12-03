@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 from collections import defaultdict
 #percorso file json
-json_path = Path("C:\dataset_annotato\_annotations.coco.json")
+BASE_DIR = Path(__file__).resolve().parent
+json_path = BASE_DIR / "data" / "_annotations.coco.json"
 
 with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
