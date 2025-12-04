@@ -58,3 +58,11 @@ class DatasetParser:
         #semplicemente stampa la lista dei nomi delle immagini con i relativi id per facilitare la ricerca in imgnametoann se dovesse servire
         for info in list(self.images_parsed):
             print("id: ",self.images_parsed[info]["id"]," file_name: ",self.images_parsed[info]["file_name"])
+
+    def get_dimensions(self,id):
+        i=self.images_parsed.get(id)
+        height = i["height"]
+        width = i["width"]
+        return(height,width)
+    def getnamefromid(self,id):
+        return(self.images_parsed[id]["file_name"])
