@@ -1,6 +1,7 @@
 from src.Parser_datset_json import DatasetParser
 #window[0] = x orizzontale punto in alto a sinistra ,window[1] y verticale punto in alto a sinistra,window[2] larghezza,window[3] altezza
 def simmetria_check(data,id):
+    asse_simmetria_glob_x=data.get_dimensions(id)[1]/2
     bbox=data.imgidtoann(id)
     tolleranza=100
     results=[]
@@ -10,6 +11,9 @@ def simmetria_check(data,id):
     results.append(simmetria_balconi_y(bbox,tolleranza))
     results.append(simmetria_porta_finestra_x(bbox,tolleranza))
     results.append(simmetria_porta_finestra_y(bbox,tolleranza))
+    if simmetria_finestre_x(bbox,tolleranza)==1 and simmetria_balconi_x(bbox,tolleranza)==1 and simmetria_porta_finestra_x(bbox,tolleranza):
+        results.append(simmetria_assoluta_x(asse_simmetria_glob_x,bbox,tolleranza))
+    else: results.append(0)
     return(results)
 
 def simmetria_finestre_x(bbox,tolleranza):
@@ -153,3 +157,48 @@ def simmetria_porta_finestra_y(bbox,tolleranza):
     if matches==len(porta_finestra_up)and matches==len(porta_finestra)-len(porta_finestra_up):
         return(1)
     return(0)
+
+def simmetria_assoluta_x(asse,bbox,tolleranza):
+    matchesw=0
+    matchesb=0
+    matcheswd=0
+    finestre=[]
+    balconi=[]
+    porta_finestra=[]
+    for window in bbox.get("Windows"):
+        if window[0]<asse and window[0] + window [2] > asse:
+            continue
+        finestre.append(window)
+    finestre_sx = [(fx, fy,lar,lun) for (fx, fy,lar,lun) in finestre if fx < asse]
+    for (fx,fy,lar,lun) in finestre_sx:
+        x_speculare= (asse*2)-(fx+lar)
+        for (fx2,fy2,lar2,lun2) in finestre:
+            if abs(fx2 - x_speculare) <= tolleranza and abs(fy2 - fy) <= tolleranza:
+                matchesw+=1
+    if matchesw!=len(finestre_sx) or matchesw!=len(finestre)-len(finestre_sx):
+        return(0)
+    for bal in bbox.get("Balconies"):
+        if bal[0]<asse and bal[0] + bal [2] > asse:
+            continue
+        balconi.append(bal)
+    balconi_sx = [(fx, fy,lar,lun) for (fx, fy,lar,lun) in balconi if fx < asse]
+    for (fx,fy,lar,lun) in balconi_sx:
+        x_speculare= (asse*2)-(fx+lar)
+        for (fx2,fy2,lar2,lun2) in balconi:
+            if abs(fx2 - x_speculare) <= tolleranza and abs(fy2 - fy) <= tolleranza:
+                matchesb+=1
+    if matchesb!=len(balconi_sx) or matchesb!=len(balconi)-len(balconi_sx):
+        return(0)
+    for port_fin in bbox.get("window_door"):
+        if port_fin[0]<asse and port_fin[0] + port_fin [2] > asse:
+            continue
+        porta_finestra.append(port_fin)
+    porta_finestra_sx = [(fx, fy,lar,lun) for (fx, fy,lar,lun) in porta_finestra if fx < asse]
+    for (fx,fy,lar,lun) in porta_finestra_sx:
+        x_speculare= (asse*2)-(fx+lar)
+        for (fx2,fy2,lar2,lun2) in porta_finestra:
+            if abs(fx2 - x_speculare) <= tolleranza and abs(fy2 - fy) <= tolleranza:
+                matcheswd+=1
+    if matcheswd!=len(porta_finestra_sx) or matcheswd!=len(porta_finestra)-len(porta_finestra_sx):
+        return(0)
+    return(1)
