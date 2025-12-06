@@ -10,7 +10,7 @@ data=DatasetParser(json_path)
 
 for i in range(len(data.images_parsed)):
     print(data.getnamefromid(i),simmetria_check(data,i))
-
+    
 #esempi di print per testare le funzioni
 #print(data.imgidtoann(2))
 #print(data.imgnametoann("IMG5417.jpeg")) 

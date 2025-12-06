@@ -11,8 +11,12 @@ def simmetria_check(data,id):
     results.append(simmetria_balconi_y(bbox,tolleranza))
     results.append(simmetria_porta_finestra_x(bbox,tolleranza))
     results.append(simmetria_porta_finestra_y(bbox,tolleranza))
-    if simmetria_finestre_x(bbox,tolleranza)==1 and simmetria_balconi_x(bbox,tolleranza)==1 and simmetria_porta_finestra_x(bbox,tolleranza):
+    results.append(simmetria_piano_terra(asse_simmetria_glob_x,bbox,tolleranza))
+    if simmetria_finestre_x(bbox,tolleranza)==1 and simmetria_balconi_x(bbox,tolleranza)==1 and simmetria_porta_finestra_x(bbox,tolleranza)==1:
         results.append(simmetria_assoluta_x(asse_simmetria_glob_x,bbox,tolleranza))
+    else: results.append(0)
+    if simmetria_finestre_y(bbox,tolleranza)==1 and simmetria_balconi_y(bbox,tolleranza)==1 and simmetria_porta_finestra_y(bbox,tolleranza)==1:
+        results.append(simmetria_assoluta_y(bbox,tolleranza))
     else: results.append(0)
     return(results)
 
@@ -86,7 +90,7 @@ def simmetria_balconi_x(bbox,tolleranza):
     return(0)
 
 def simmetria_balconi_y(bbox,tolleranza):
-    tolleranza+=100
+    tolleranzay=tolleranza+200
     if bbox.get("Balconies") is None:
         return 0
     high_bound=min(y[1] for y in bbox.get("Balconies"))
@@ -106,7 +110,7 @@ def simmetria_balconi_y(bbox,tolleranza):
     for (fx,fy,lar,altezza_normalizzata) in balconi_up:
         y_speculare= (asse_simmetria_y*2)-(fy+altezza_normalizzata)
         for (fx2,fy2,lar2,lun2) in balconi:
-            if abs(fy2 - y_speculare) <= tolleranza and abs(fx2 - fx) <= tolleranza:
+            if abs(fy2 - y_speculare) <= tolleranzay and abs(fx2 - fx) <= tolleranza:
                 matches+=1
     if matches==len(balconi_up)and matches==len(balconi)-len(balconi_up):
         return(1)
@@ -158,6 +162,32 @@ def simmetria_porta_finestra_y(bbox,tolleranza):
         return(1)
     return(0)
 
+def simmetria_piano_terra(asse,bbox,tolleranza):
+    if bbox.get("Shop") is None and bbox.get("entrance_door") is None:
+        return 0
+    negozi_portoni=[]
+    matches=0
+    if bbox.get("shop") is not None:
+        for bal in bbox.get("Shop"):
+            if bal[0]<asse and bal[0] + bal [2] > asse:
+                continue
+            negozi_portoni.append(bal)
+    if bbox.get("entrance_door") is not None:
+        for bal in bbox.get("entrance_door"):
+            if bal[0]<asse and bal[0] + bal [2] > asse:
+                continue
+            negozi_portoni.append(bal)
+    neg_port_sx = [(fx, fy,lar,lun) for (fx, fy,lar,lun) in negozi_portoni if fx < asse]
+    for (fx,fy,lar,lun) in neg_port_sx:
+        x_speculare= (asse*2)-(fx+lar)
+        for (fx2,fy2,lar2,lun2) in negozi_portoni:
+            if abs(fx2 - x_speculare) <= tolleranza and abs(fy2 - fy) <= tolleranza:
+                matches+=1
+    if matches==len(neg_port_sx)and matches==len(negozi_portoni)-len(neg_port_sx):
+        return(1)
+    return(0)
+
+
 def simmetria_assoluta_x(asse,bbox,tolleranza):
     matchesw=0
     matchesb=0
@@ -200,5 +230,60 @@ def simmetria_assoluta_x(asse,bbox,tolleranza):
             if abs(fx2 - x_speculare) <= tolleranza and abs(fy2 - fy) <= tolleranza:
                 matcheswd+=1
     if matcheswd!=len(porta_finestra_sx) or matcheswd!=len(porta_finestra)-len(porta_finestra_sx):
+        return(0)
+    return(1)
+def simmetria_assoluta_y(bbox,tolleranza):
+    high_bound_b=min(y[1] for y in bbox.get("Balconies"))
+    high_bound_w=min(y[1] for y in bbox.get("Windows"))
+    high_bound_wd=min(y[1] for y in bbox.get("window_door"))
+    high_bound=min(high_bound_w,high_bound_b,high_bound_wd)
+    riga_min_b = max(bbox.get("Balconies"), key=lambda x: x[1])
+    riga_min_w = max(bbox.get("Windows"), key=lambda x: x[1])
+    riga_min_wd = max(bbox.get("window_door"), key=lambda x: x[1])
+    low_bound=max(riga_min_w[1]+riga_min_w[3],riga_min_b[1]+riga_min_b[3],riga_min_wd[1]+riga_min_wd[3])
+    asse_simmetria_y=int((high_bound+low_bound)/2)
+    matchesw=0
+    matchesb=0
+    matcheswd=0
+    finestre=[]
+    balconi=[]
+    porta_finestra=[]
+    for window in bbox.get("Windows"):
+        if window[1]<asse_simmetria_y and window[1] + window [3] > asse_simmetria_y:
+            continue
+        finestre.append(window)
+    finestre_up = [(fx, fy,lar,lun) for (fx, fy,lar,lun) in finestre if fy < asse_simmetria_y]
+    for (fx,fy,lar,lun) in finestre_up:
+        y_speculare= (asse_simmetria_y*2)-(fy+lun)
+        for (fx2,fy2,lar2,lun2) in finestre:
+            if abs(fy2 - y_speculare) <= tolleranza and abs(fx2 - fx) <= tolleranza:
+                matches+=1
+    if matchesw!=len(finestre_up) or matchesw!=len(finestre)-len(finestre_up):
+        return(0)
+    for bal in bbox.get("Balconies"):
+        if bal[1]<asse_simmetria_y and bal[1] + bal [3] > asse_simmetria_y:
+            continue
+        bal[1]=(bal[1]+(bal[1]+bal[3]))/2
+        bal[1]-=altezza_normalizzata/2
+        balconi.append(bal)
+    balconi_up = [(fx, fy,lar,altezza_normalizzata) for (fx, fy,lar,altezza_normalizzata) in balconi if fy < asse_simmetria_y]
+    for (fx,fy,lar,altezza_normalizzata) in balconi_up:
+        y_speculare= (asse_simmetria_y*2)-(fy+altezza_normalizzata)
+        for (fx2,fy2,lar2,lun2) in balconi:
+            if abs(fy2 - y_speculare) <= tolleranzay and abs(fx2 - fx) <= tolleranza:
+                matches+=1
+    if matchesb!=len(balconi_up) or matchesb!=len(balconi)-len(balconi_up):
+        return(0)
+    for port_fin in bbox.get("window_door"):
+        if port_fin[1]<asse_simmetria_y and port_fin[1] + port_fin [3] > asse_simmetria_y:
+            continue
+        porta_finestra.append(port_fin)
+    porta_finestra_up = [(fx, fy,lar,lun) for (fx, fy,lar,lun) in porta_finestra if fy < asse_simmetria_y]
+    for (fx,fy,lar,lun) in porta_finestra_up:
+        y_speculare= (asse_simmetria_y*2)-(fy+lun)
+        for (fx2,fy2,lar2,lun2) in porta_finestra:
+            if abs(fy2 - y_speculare) <= tolleranza and abs(fx2 - fx) <= tolleranza:
+                matches+=1
+    if matcheswd!=len(porta_finestra_up) or matcheswd!=len(porta_finestra)-len(porta_finestra_up):
         return(0)
     return(1)
