@@ -270,7 +270,7 @@ def simmetria_assoluta_y(bbox,tolleranza):
     for (fx,fy,lar,altezza_normalizzata) in balconi_up:
         y_speculare= (asse_simmetria_y*2)-(fy+altezza_normalizzata)
         for (fx2,fy2,lar2,lun2) in balconi:
-            if abs(fy2 - y_speculare) <= tolleranzay and abs(fx2 - fx) <= tolleranza:
+            if abs(fy2 - y_speculare) <= tolleranza and abs(fx2 - fx) <= tolleranza:
                 matches+=1
     if matchesb!=len(balconi_up) or matchesb!=len(balconi)-len(balconi_up):
         return(0)
