@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from sklearn.cluster import KMeans
 
-# Mappa dei colori (invariata)
+# Mappa dei colori
 COLOR_MAP = {
     "Nero": (0, 0, 0), "Bianco": (255, 255, 255), "Grigio Scuro": (169, 169, 169),
     "Grigio": (128, 128, 128), "Rosso": (255, 0, 0), "Rosso Scuro": (139, 0, 0),
@@ -16,7 +16,7 @@ COLOR_MAP = {
 
 def _get_closest_color_name(requested_rgb):
     min_distance = float('inf')
-    closest_name = "Sconosciuto"
+    closest_name = "Unknown"
     r_c, g_c, b_c = requested_rgb
     for name, (r, g, b) in COLOR_MAP.items():
         distance = ((r_c - r) ** 2 + (g_c - g) ** 2 + (b_c - b) ** 2) ** 0.5
@@ -36,7 +36,7 @@ def get_dominant_colors(image_path, k=3):
     """
     img = cv2.imread(image_path)
     if img is None:
-        raise FileNotFoundError(f"Impossibile trovare l'immagine: {image_path}")
+        raise FileNotFoundError(f"Image not found: {image_path}")
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -50,18 +50,16 @@ def get_dominant_colors(image_path, k=3):
 
     pixels = img.reshape(-1, 3)
 
-    # Eseguiamo K-Means
+    # Esecuzione di K-Means
     kmeans = KMeans(n_clusters=k, n_init=10)
     kmeans.fit(pixels)
 
-    # --- NUOVA LOGICA DI CONTEGGIO E PERCENTUALI ---
-
-    # Contiamo quante volte appare ogni etichetta (quanti pixel per ogni colore)
+    # Conta quante volte appare ogni etichetta, quanti pixel per ogni colore
     # labels_ contiene l'indice del cluster per ogni pixel
     unique_labels, counts = np.unique(kmeans.labels_, return_counts=True)
 
-    # Ordiniamo i conteggi in ordine decrescente (dal più frequente al meno)
-    # argsort ci dà gli indici che ordinerebbero l'array. [::-1] li inverte per decrescere.
+    # Ordina i conteggi in ordine decrescente (dal più frequente al meno frequente)
+    # argsort restituisce gli indici che ordinerebbero l'array. [::-1] li inverte per decrescere.
     sorted_indices = np.argsort(counts)[::-1]
 
     total_pixels = pixels.shape[0]
