@@ -13,8 +13,8 @@ COLOR_MAP = {
     "Crema": (255, 253, 208), "Marrone Scuro": (101, 67, 33), "Sabbia": (194, 178, 128)
 }
 
-
-def _get_closest_color_name(requested_rgb):
+#Mappa i colori che trova nell'immagine in base al dizionario definito sopra.
+def get_color_name(requested_rgb):
     min_distance = float('inf')
     closest_name = "Unknown"
     r_c, g_c, b_c = requested_rgb
@@ -25,15 +25,11 @@ def _get_closest_color_name(requested_rgb):
             closest_name = name
     return closest_name
 
-
 def rgb_to_hex(color):
     return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
 
-
+#Restituisce i k colori dominanti ordinati per percentuale di presenza.
 def get_dominant_colors(image_path, k=3):
-    """
-    Restituisce i k colori dominanti ordinati per percentuale di presenza.
-    """
     img = cv2.imread(image_path)
     if img is None:
         raise FileNotFoundError(f"Image not found: {image_path}")
@@ -71,7 +67,7 @@ def get_dominant_colors(image_path, k=3):
     for i in range(top_n):
         index = sorted_indices[i]
 
-        # Recuperiamo il centroide (colore) e il conteggio corrispondente
+        # Recuperiamo il colore dominante e il conteggio corrispondente
         center = kmeans.cluster_centers_[index]
         count = counts[index]
 
@@ -80,7 +76,7 @@ def get_dominant_colors(image_path, k=3):
 
         color_rgb = tuple(center.round(0).astype(int))
         hex_val = rgb_to_hex(color_rgb)
-        name_val = _get_closest_color_name(color_rgb)
+        name_val = get_color_name(color_rgb)
 
         results.append({
             "name": name_val,
