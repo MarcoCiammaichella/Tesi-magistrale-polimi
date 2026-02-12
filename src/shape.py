@@ -46,6 +46,22 @@ def sky_mask_not_sky(image_path, debug=False):
         cv2.imwrite("debug_sky_all.png", mask_sky)
 
     return building
+def naive_rect(img):
+    pure_red = np.array([0, 0, 255])
+
+    # Creiamo una maschera che identifica i pixel corrispondenti
+    mask = np.all(img == pure_red, axis=-1)
+
+    # L'area è data dal numero di pixel 'True' nella maschera
+    area_pixel = np.sum(mask)
+    total_pixels = img.shape[0] * img.shape[1]
+
+    # Calcolo del rateo (rapporto tra 0.0 e 1.0)
+    red_ratio = area_pixel / total_pixels
+    if red_ratio > 0.07:
+        return 1
+    else:
+        return 0
 
 def is_rectangle_like(mask, area_ratio_threshold=0.9, debug=False):
     # mask: immagine binaria 0/255 con zona di interesse in bianco
@@ -86,9 +102,12 @@ def is_rectangle_like(mask, area_ratio_threshold=0.9, debug=False):
 # Esempio d'uso
 if __name__ == "__main__":
     BASE_DIR = Path(__file__).resolve().parent
-    path =  "C:/Users/marco/OneDrive/Desktop/tesi_github/data/dataset_preprocessato_a_mano/IMG_8148.jpg"
-    test = sky_mask_not_sky(path,debug=True)
-    is_rect, score, verts,img = is_rectangle_like(test, area_ratio_threshold=0.9, debug=True)
-    print("Simile a rettangolo:", is_rect)
-    print("Score (area_ratio):", score)
-    print("vertici :",verts)
+    path =  "D:/Utenti/Marco/Desktop/tesi/Tesi-magistrale-polimi/test.png"
+    img = cv2.imread(path)
+    area=naive_rect(img)
+    print(area)
+    #test = sky_mask_not_sky(path,debug=True)
+    #is_rect, score, verts,img = is_rectangle_like(test, area_ratio_threshold=0.9, debug=True)
+    #print("Simile a rettangolo:", is_rect)
+    #print("Score (area_ratio):", score)
+    #print("vertici :",verts)

@@ -129,7 +129,7 @@ def Maschera_poligono(img_bgr):
     return out
 
 if __name__ == "__main__":
-    path =  "C:/Users/marco/OneDrive/Desktop/dataset palazzi/IMG_8148.jpg"
+    path =  "D:/Utenti/Marco\Desktop/tesi/Dataset immagini Lambrate/IMG_5433.jpeg"
     warped=Correggi_prospettiva(path)
     test=Maschera_poligono(warped)
     cv2.imwrite("test.png", test)
