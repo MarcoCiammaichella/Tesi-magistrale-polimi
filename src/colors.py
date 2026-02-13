@@ -4,13 +4,89 @@ from sklearn.cluster import KMeans
 
 # Mappa dei colori
 COLOR_MAP = {
-    "Nero": (0, 0, 0), "Bianco": (255, 255, 255), "Grigio Scuro": (169, 169, 169),
-    "Grigio": (128, 128, 128), "Rosso": (255, 0, 0), "Rosso Scuro": (139, 0, 0),
-    "Verde": (0, 128, 0), "Verde Chiaro": (144, 238, 144), "Blu": (0, 0, 255),
-    "Blu Navy": (0, 0, 128), "Azzurro": (135, 206, 235), "Giallo": (255, 255, 0),
-    "Arancione": (255, 165, 0), "Viola": (128, 0, 128), "Rosa": (255, 192, 203),
-    "Marrone": (165, 42, 42), "Beige": (245, 245, 220), "Oro": (255, 215, 0),
-    "Crema": (255, 253, 208), "Marrone Scuro": (101, 67, 33), "Sabbia": (194, 178, 128)
+    # --- BIANCHI E CHIARI (Fondamentali per intonaci e luci) ---
+    "Bianco Assoluto": (255, 255, 255),
+    "Panna": (255, 253, 208),
+    "Avorio": (255, 255, 240),
+    "Bianco Antico": (250, 235, 215),
+    "Beige Chiaro": (245, 245, 220),
+    "Perla": (234, 230, 202),
+    "Ghiaccio": (240, 248, 255),
+
+    # --- GRIGI E NERI (Asfalto, Cemento, Ombre, Tetti) ---
+    "Nero": (0, 0, 0),
+    "Nero Carbone": (20, 20, 20),
+    "Grigio Antracite": (41, 49, 51),  # Molto comune per infissi moderni
+    "Grigio Scuro": (105, 105, 105),
+    "Grigio Cemento": (128, 128, 128),
+    "Grigio Argento": (192, 192, 192),
+    "Grigio Perla": (211, 211, 211),
+    "Grigio Ardesia (Bluastro)": (112, 128, 144), # Tetti, asfalto bagnato
+    "Grigio Topo": (100, 107, 99),
+    "Tortora": (176, 166, 149), # Colore RE dell'architettura moderna
+
+    # --- MARRONI E TERRE (Mattoni, Legno, Terreno) ---
+    "Marrone Scuro": (101, 67, 33),
+    "Cioccolato": (139, 69, 19),
+    "Marrone": (165, 42, 42),
+    "Terra di Siena": (160, 82, 45), # Classico italiano
+    "Ruggine": (183, 65, 14),
+    "Mattone": (178, 34, 34),       # Fondamentale per le facciate
+    "Terracotta": (226, 114, 91),
+    "Bronzo": (205, 127, 50),
+    "Sabbia": (194, 178, 128),
+    "Kaki": (240, 230, 140),
+    "Cammello": (193, 154, 107),
+
+    # --- ROSSI E ROSA ---
+    "Rosso": (255, 0, 0),
+    "Rosso Scuro": (139, 0, 0),
+    "Bordeaux": (128, 0, 32),
+    "Rosso Veneziano": (200, 8, 21),
+    "Corallo": (255, 127, 80),
+    "Rosa": (255, 192, 203),
+    "Rosa Antico": (212, 115, 129), # Facciate storiche
+    "Fucsia": (255, 0, 255),
+    "Pesca": (255, 218, 185),
+
+    # --- GIALLE E ARANCIONI ---
+    "Arancione": (255, 165, 0),
+    "Arancio Scuro": (255, 140, 0),
+    "Giallo": (255, 255, 0),
+    "Oro": (255, 215, 0),
+    "Ocra": (204, 119, 34),       # Facciate Milano/Roma
+    "Giallo Napoli": (247, 232, 159),
+    "Senape": (255, 219, 88),
+
+    # --- VERDI (Vegetazione) ---
+    "Verde": (0, 128, 0),
+    "Verde Scuro (Foresta)": (34, 139, 34),
+    "Verde Pino": (1, 121, 111),
+    "Verde Prato": (124, 252, 0),
+    "Verde Oliva": (128, 128, 0),
+    "Verde Militare": (85, 107, 47),
+    "Verde Acqua": (102, 205, 170),
+    "Verde Smeraldo": (80, 200, 120),
+    "Verde Salvia": (158, 169, 147), # Molto comune negli infissi
+
+    # --- BLU E CIELO ---
+    "Blu": (0, 0, 255),
+    "Blu Notte": (25, 25, 112),
+    "Blu Navy": (0, 0, 128),
+    "Blu Reale": (65, 105, 225),
+    "Zaffiro": (15, 82, 186),
+    "Azzurro": (135, 206, 235),
+    "Celeste": (178, 255, 255),
+    "Turchese": (64, 224, 208),
+    "Ciano": (0, 255, 255),
+    "Petrolio": (0, 95, 106),
+    "Indaco": (75, 0, 130),
+
+    # --- VIOLA ---
+    "Viola": (128, 0, 128),
+    "Lilla": (200, 162, 200),
+    "Lavanda": (230, 230, 250),
+    "Melanzana": (153, 17, 153)
 }
 
 #Mappa i colori che trova nell'immagine in base al dizionario definito sopra.
