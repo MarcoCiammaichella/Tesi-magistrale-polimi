@@ -63,9 +63,10 @@ def naive_rect(img):
     else:
         return 0
 
-def is_rectangle_like(mask, area_ratio_threshold=0.9, debug=False):
+def is_rectangle_like(img, area_ratio_threshold=0.9, debug=False):
     # mask: immagine binaria 0/255 con zona di interesse in bianco
-
+    mask_rosso = np.all(img == [0, 0, 255], axis=2).astype(np.uint8) * 255
+    mask = cv2.bitwise_not(mask_rosso)
     # 1. Trova contorni
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                                    cv2.CHAIN_APPROX_SIMPLE)
@@ -102,10 +103,10 @@ def is_rectangle_like(mask, area_ratio_threshold=0.9, debug=False):
 # Esempio d'uso
 if __name__ == "__main__":
     BASE_DIR = Path(__file__).resolve().parent
-    path =  "D:/Utenti/Marco/Desktop/tesi/Tesi-magistrale-polimi/test.png"
+    path =  "C:/Users/marco/OneDrive/Desktop/tesi_github/test.png"
     img = cv2.imread(path)
-    area=naive_rect(img)
-    print(area)
+    area,ratio,v,img=is_rectangle_like(img,0.9,True)
+    print(area,ratio,v)
     #test = sky_mask_not_sky(path,debug=True)
     #is_rect, score, verts,img = is_rectangle_like(test, area_ratio_threshold=0.9, debug=True)
     #print("Simile a rettangolo:", is_rect)
