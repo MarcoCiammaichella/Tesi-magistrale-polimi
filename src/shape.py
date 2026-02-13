@@ -2,80 +2,18 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-
-def sky_mask_not_sky(image_path, debug=False):
-    # 1. Leggi immagine
-    img = cv2.imread(image_path)
-    if img is None:
-        raise ValueError("Immagine non trovata")
-
-    # 2. Converti in HSV
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-    # 3. Range di cielo (da tarare sul tuo dataset)
-    #   - H: circa azzurro/blu chiaro
-    #   - S: almeno un po' saturo
-    #   - V: abbastanza chiaro
-    lower_sky = np.array([85, 20, 120], dtype=np.uint8)
-    upper_sky = np.array([140, 255, 255], dtype=np.uint8)
-    mask_sky = cv2.inRange(hsv, lower_sky, upper_sky)
-    #lower_cloud = np.array([0,   0,  180])   # H qualsiasi, S molto bassa, V alta
-    #upper_cloud = np.array([179, 40, 255])
-    #mask_cloud = cv2.inRange(hsv, lower_cloud, upper_cloud) 
-
-    #mask_sky = cv2.bitwise_or(blue_mask, mask_cloud)
-
-# pulizia: togli rumore piccolo
-    kernel = np.ones((5, 5), np.uint8)
-    mask_sky = cv2.morphologyEx(mask_sky, cv2.MORPH_OPEN, kernel, iterations=1)
-    mask_sky = cv2.morphologyEx(mask_sky, cv2.MORPH_CLOSE, kernel, iterations=1)
-    h, w = mask_sky.shape
-# tieni solo la parte alta come cielo (es. sopra il 60% dell'immagine)
-    row_cut = int(0.5 * h)
-    mask_sky[row_cut:h, :] = 0
-
-
-    # 6. Maschera NON cielo (quello che ti serve)
-    not_sky_mask = cv2.bitwise_not(mask_sky)
-    kernel_big = np.ones((35, 35), np.uint8)
-    building = cv2.morphologyEx(not_sky_mask, cv2.MORPH_CLOSE, kernel_big, iterations=2)
-
-    if debug:
-        #cv2.imwrite("debug_sky.png", blue_mask)
-        #cv2.imwrite("debug_clouds.png", mask_cloud)
-        cv2.imwrite("debug_sky_all.png", mask_sky)
-
-    return building
-def naive_rect(img):
-    pure_red = np.array([0, 0, 255])
-
-    # Creiamo una maschera che identifica i pixel corrispondenti
-    mask = np.all(img == pure_red, axis=-1)
-
-    # L'area è data dal numero di pixel 'True' nella maschera
-    area_pixel = np.sum(mask)
-    total_pixels = img.shape[0] * img.shape[1]
-
-    # Calcolo del rateo (rapporto tra 0.0 e 1.0)
-    red_ratio = area_pixel / total_pixels
-    if red_ratio > 0.07:
-        return 1
-    else:
-        return 0
-
 def is_rectangle_like(img, area_ratio_threshold=0.9, debug=False):
     # mask: immagine binaria 0/255 con zona di interesse in bianco
     mask_rosso = np.all(img == [0, 0, 255], axis=2).astype(np.uint8) * 255
     mask = cv2.bitwise_not(mask_rosso)
+
     # 1. Trova contorni
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
-                                   cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if not contours:
         return False, 0.0, 0, None
 
     # 2. Prendi il contorno con area massima
     cnt = max(contours, key=cv2.contourArea)
-
     contour_area = cv2.contourArea(cnt)
     x, y, w, h = cv2.boundingRect(cnt)  # rettangolo allineato agli assi
     rect_area = w * h if w > 0 and h > 0 else 1
@@ -87,7 +25,6 @@ def is_rectangle_like(img, area_ratio_threshold=0.9, debug=False):
     epsilon = 0.01 * cv2.arcLength(cnt, True)
     approx = cv2.approxPolyDP(cnt, epsilon, True)  # poligono approssimato [web:44][web:55]
     num_vertices = len(approx)
-
     is_rect_like = (area_ratio >= area_ratio_threshold) and (3 <= num_vertices <= 6)
 
     debug_img = None
@@ -98,17 +35,3 @@ def is_rectangle_like(img, area_ratio_threshold=0.9, debug=False):
         cv2.imwrite("debug_mask_rect.png", debug_img)
 
     return is_rect_like, area_ratio, num_vertices, debug_img
-
-
-# Esempio d'uso
-if __name__ == "__main__":
-    BASE_DIR = Path(__file__).resolve().parent
-    path =  "C:/Users/marco/OneDrive/Desktop/tesi_github/test.png"
-    img = cv2.imread(path)
-    area,ratio,v,img=is_rectangle_like(img,0.9,True)
-    print(area,ratio,v)
-    #test = sky_mask_not_sky(path,debug=True)
-    #is_rect, score, verts,img = is_rectangle_like(test, area_ratio_threshold=0.9, debug=True)
-    #print("Simile a rettangolo:", is_rect)
-    #print("Score (area_ratio):", score)
-    #print("vertici :",verts)
