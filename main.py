@@ -28,8 +28,9 @@ def get_image_paths():
 def b7(id,img_corrected):
     colors, distanza = get_dominant_colors(img_corrected)
     color_var = 0
-    if distanza <= 100:
+    if distanza <= 150:
         color_var = 1
+    print(distanza)
     rect=is_rectangle_like(img_corrected)
     #print('Is rectangle like?', rect)
     simmetria=simmetria_check(data,id)
