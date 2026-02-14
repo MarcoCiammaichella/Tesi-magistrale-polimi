@@ -26,19 +26,26 @@ def get_image_paths():
     return image_paths
 
 def b7(id,img_corrected):
-    colors,distanza=get_dominant_colors(img_corrected)
-    color_var=0
-    if distanza<=100:
-        color_var =1
+    colors, distanza = get_dominant_colors(img_corrected)
+    color_var = 0
+    if distanza <= 100:
+        color_var = 1
     rect=is_rectangle_like(img_corrected)
+    #print('Is rectangle like?', rect)
     simmetria=simmetria_check(data,id)
+    #print('Overall symmetry value for the building:', round(simmetria,0))
     wtf=WindowToFacadeRatio(data,id)
+    #print('Windows to facade ratio:', round(wtf*100,2))
     vhl=vertical_horizontal_lines(data,id)
+    #print('Vertical and horizontal lines presence:', round(vhl,2))
     T=negozi(data,id)
+    #print('Presence of commercial activities:', T)
     N=street_art(data,id)
+    #print('Presence of street art:', N)
     O=0.5*simmetria+0.5*int(rect)
     C=0.2*vhl+0.6*wtf+0.2*color_var
     VisR=0.3*O+0.2*C+0.3*T+0.2*N
+    #print('VisR value:', round(VisR+100,2))
     return(VisR)
     
 def b11(img_corrected):
@@ -46,6 +53,7 @@ def b11(img_corrected):
     colors,distanza=get_dominant_colors(img_corrected)
     res=0.5*rect+0.5*colors
     return(res)
+
 if __name__ == "__main__":
     print("Inserisci l'id dell'immagine che vuoi analizzare:")
     id=int(input())
@@ -56,8 +64,3 @@ if __name__ == "__main__":
     res2=b11(img_corrected)
     b10=((res1+res2)/2)*100
     print(b10)
-    # riconoscmento forme
-    #job_shapes()
-
-    #riconoscimento colori
-    #job_colors()
