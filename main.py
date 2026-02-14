@@ -26,6 +26,10 @@ def get_image_paths():
     return image_paths
 
 def b7(id,img_corrected):
+    colors,distanza=get_dominant_colors(img_corrected)
+    color_var=0
+    if distanza<=100:
+        color_var =1
     rect=is_rectangle_like(img_corrected)
     simmetria=simmetria_check(data,id)
     wtf=WindowToFacadeRatio(data,id)
@@ -33,13 +37,13 @@ def b7(id,img_corrected):
     T=negozi(data,id)
     N=street_art(data,id)
     O=0.5*simmetria+0.5*int(rect)
-    C=0.2*vhl+0.8*wtf
+    C=0.2*vhl+0.6*wtf+0.2*color_var
     VisR=0.3*O+0.2*C+0.3*T+0.2*N
     return(VisR)
     
 def b11(img_corrected):
     rect=is_rectangle_like(img_corrected)
-    colors=get_dominant_colors(img_corrected)
+    colors,distanza=get_dominant_colors(img_corrected)
     res=0.5*rect+0.5*colors
     return(res)
 if __name__ == "__main__":

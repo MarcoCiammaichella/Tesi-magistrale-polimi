@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from sklearn.cluster import KMeans
+import math
 
 # Mappa dei colori
 COLOR_MAP = {
@@ -139,7 +140,7 @@ def get_dominant_colors(img, k=3):
 
     # Prendiamo solo i primi 3 risultati (o k se k<3)
     top_n = min(3, len(sorted_indices))
-
+    colors=[]
     for i in range(top_n):
         index = sorted_indices[i]
 
@@ -153,7 +154,11 @@ def get_dominant_colors(img, k=3):
         color_rgb = tuple(center.round(0).astype(int))
         hex_val = rgb_to_hex(color_rgb)
         name_val = get_color_name(color_rgb)
+        colors.append(color_rgb)
 
         results.append(round(percentage, 1))  # Arrotondiamo a 1 decimale)
+    r1,g1,b1=colors[0]
+    r2,g2,b2=colors[1]
+    distanza=math.sqrt((r1 - r2)**2 + (g1 - g2)**2 + (b1 - b2)**2)
     
-    return (results[0]+0.25*results[1])
+    return (results[0]+0.25*results[1],distanza)
