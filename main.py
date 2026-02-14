@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import glob
 import os
-import cv2
+import matplotlib.pyplot as plt
 from src.Parser_datset_json import DatasetParser
 from src.simmetria import simmetria_check
 from src.prospettiva import Prospettiva
@@ -46,6 +46,41 @@ def b11(img_corrected):
     colors,distanza=get_dominant_colors(img_corrected)
     res=0.5*rect+0.5*colors
     return(res)
+
+def plot_performance_gauge(valore):
+    # Configurazione dei limiti e colori (basati sulla tua immagine)
+    thresholds = [20, 30, 20, 30]  # Ampiezza delle sezioni: 0-20, 20-50, 50-70, 70-100
+    colors = ['#e74c3c', '#f1c40f', '#a2d149', '#5a823f'] # Rosso, Giallo, Verde chiaro, Verde scuro
+    labels = ['Low', 'Acceptable', 'Good', 'Excellent']
+
+    fig, ax = plt.subplots(figsize=(10, 2))
+
+    # 1. Disegna le sezioni colorate sullo sfondo
+    left = 0
+    for i in range(len(thresholds)):
+        ax.barh(0, thresholds[i], left=left, color=colors[i], height=0.5)
+        # Aggiungi il testo al centro di ogni sezione
+        ax.text(left + thresholds[i]/2, 0, labels[i], 
+                ha='center', va='center', fontsize=12, fontweight='bold')
+        left += thresholds[i]
+
+    # 2. Aggiungi l'indicatore per il valore attuale
+    ax.axvline(valore, color='black', linewidth=3)
+    ax.plot(valore, 0, 'ko', markersize=10) # Un punto nero per renderlo più visibile
+
+    # 3. Formattazione estetica
+    ax.set_xlim(0, 100)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_yticks([]) # Rimuove l'asse Y
+    ax.set_xticks([0, 20, 50, 70, 100])
+    ax.set_title(f"Performance Score: {valore}", pad=20)
+
+    # Rimuovi i bordi del grafico per pulizia
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
 if __name__ == "__main__":
     print("Inserisci l'id dell'immagine che vuoi analizzare:")
     id=int(input())
@@ -55,7 +90,7 @@ if __name__ == "__main__":
     res1=b7(id,img_corrected)
     res2=b11(img_corrected)
     b10=((res1+res2)/2)*100
-    print(b10)
+    plot_performance_gauge(b10)
     # riconoscmento forme
     #job_shapes()
 
