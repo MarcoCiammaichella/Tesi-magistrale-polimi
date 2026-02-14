@@ -5,20 +5,22 @@ def simmetria_check(data,id):
     bbox=data.imgidtoann(id)
     tolleranza=100
     results=[]
-    results.append(simmetria_finestre_x(bbox,tolleranza))
-    results.append(simmetria_finestre_y(bbox,tolleranza))
-    results.append(simmetria_balconi_x(bbox,tolleranza))
-    results.append(simmetria_balconi_y(bbox,tolleranza))
-    results.append(simmetria_porta_finestra_x(bbox,tolleranza))
-    results.append(simmetria_porta_finestra_y(bbox,tolleranza))
-    results.append(simmetria_piano_terra(asse_simmetria_glob_x,bbox,tolleranza))
+    #results.append(simmetria_finestre_x(bbox,tolleranza))
+    #results.append(simmetria_finestre_y(bbox,tolleranza))
+    #results.append(simmetria_balconi_x(bbox,tolleranza))
+    #results.append(simmetria_balconi_y(bbox,tolleranza))
+    #results.append(simmetria_porta_finestra_x(bbox,tolleranza))
+    #results.append(simmetria_porta_finestra_y(bbox,tolleranza))
+    #results.append(simmetria_piano_terra(asse_simmetria_glob_x,bbox,tolleranza))
     if simmetria_finestre_x(bbox,tolleranza)==1 and simmetria_balconi_x(bbox,tolleranza)==1 and simmetria_porta_finestra_x(bbox,tolleranza)==1:
         results.append(simmetria_assoluta_x(asse_simmetria_glob_x,bbox,tolleranza))
     else: results.append(0)
     if simmetria_finestre_y(bbox,tolleranza)==1 and simmetria_balconi_y(bbox,tolleranza)==1 and simmetria_porta_finestra_y(bbox,tolleranza)==1:
         results.append(simmetria_assoluta_y(bbox,tolleranza))
     else: results.append(0)
-    return(results)
+    out=(0.75*results[0]+0.25*results[1])
+
+    return(out)
 
 def simmetria_finestre_x(bbox,tolleranza):
     if bbox.get("Windows") is None:

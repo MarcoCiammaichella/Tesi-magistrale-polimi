@@ -23,3 +23,17 @@ def vertical_horizontal_lines(data,id):
         return 0
     else:
         return 1 
+
+def negozi(data,id):
+    bbox=data.imgidtoann(id)
+    if bbox.get("Shop") is None:
+        return 0
+    else :
+        return 1
+
+def street_art(data,id):
+    bbox=data.imgidtoann(id)
+    if bbox.get("street_art") is None:
+        return 0
+    else :
+        return 1

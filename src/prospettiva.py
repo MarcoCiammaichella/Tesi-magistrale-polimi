@@ -127,10 +127,15 @@ def Maschera_poligono(img_bgr):
     out = img_crop * mask3 + red_bg * (1 - mask3)
 
     return out
+def Prospettiva(path):
+    warped=Correggi_prospettiva(path)
+    test=Maschera_poligono(warped)
+    cv2.imwrite("Img_corrected.png", test)
+    return test
 
 if __name__ == "__main__":
     path =  "C:/Users/marco/OneDrive/Desktop/dataset palazzi/IMG_5429.jpeg"
     warped=Correggi_prospettiva(path)
     test=Maschera_poligono(warped)
-    cv2.imwrite("test.png", test)
-    cv2.imwrite("warped.png", warped)
+    cv2.imwrite("Img_corrected.png", test)
+    

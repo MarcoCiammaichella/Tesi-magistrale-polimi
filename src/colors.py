@@ -105,10 +105,10 @@ def rgb_to_hex(color):
     return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
 
 #Restituisce i k colori dominanti ordinati per percentuale di presenza.
-def get_dominant_colors(image_path, k=3):
-    img = cv2.imread(image_path)
-    if img is None:
-        raise FileNotFoundError(f"Image not found: {image_path}")
+def get_dominant_colors(img, k=3):
+    #img = cv2.imread(image_path)
+    #if img is None:
+    #    raise FileNotFoundError(f"Image not found: {image_path}")
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -148,17 +148,12 @@ def get_dominant_colors(image_path, k=3):
         count = counts[index]
 
         # Calcolo percentuale
-        percentage = (count / total_pixels) * 100
+        percentage = (count / total_pixels) 
 
         color_rgb = tuple(center.round(0).astype(int))
         hex_val = rgb_to_hex(color_rgb)
         name_val = get_color_name(color_rgb)
 
-        results.append({
-            "name": name_val,
-            "hex": hex_val,
-            "rgb": color_rgb,
-            "percentage": round(percentage, 1)  # Arrotondiamo a 1 decimale
-        })
-
-    return results
+        results.append(round(percentage, 1))  # Arrotondiamo a 1 decimale)
+    
+    return (results[0]+0.25*results[1])

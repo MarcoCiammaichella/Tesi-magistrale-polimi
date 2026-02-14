@@ -34,4 +34,4 @@ def is_rectangle_like(img, area_ratio_threshold=0.9, debug=False):
         cv2.rectangle(debug_img, (x, y), (x + w, y + h), (255, 0, 0), 2)
         cv2.imwrite("debug_mask_rect.png", debug_img)
 
-    return is_rect_like, area_ratio, num_vertices, debug_img
+    return is_rect_like

@@ -4,19 +4,19 @@ import glob
 import os
 import cv2
 from src.Parser_datset_json import DatasetParser
-from src.window_ratio import WindowToFacadeRatio,vertical_horizontal_lines
+from src.simmetria import simmetria_check
+from src.prospettiva import Prospettiva
+from src.window_ratio import WindowToFacadeRatio,vertical_horizontal_lines,negozi,street_art
 from src.shape import is_rectangle_like
 from src.colors import get_dominant_colors
 
 # --- CONFIGURAZIONE PERCORSI ---
 BASE_DIR = Path(__file__).resolve().parent
 json_path = BASE_DIR / "data" / "_annotations.coco.json"
-folder = BASE_DIR / "data" / "dataset_preprocessato_a_mano"
+folder = BASE_DIR / "data" / "dataset_ridotto"
 data=DatasetParser(json_path)
 patterns = ["*.jpg", "*.jpeg", "*.png"]
 image_paths = []
-test=WindowToFacadeRatio(data,7)
-test2=vertical_horizontal_lines(data,2)
 
 def get_image_paths():
     patterns = ["*.jpg", "*.jpeg", "*.png"]
@@ -25,64 +25,35 @@ def get_image_paths():
         image_paths.extend(glob.glob(os.path.join(folder, p)))
     return image_paths
 
-# --- JOB 1: RICONOSCIMENTO FORMA ---
-def job_shapes():
-    print("--- AVVIO ANALISI FORME ---")
-
-    # Inizializza il parser solo se serve
-    # data = DatasetParser(json_path)
-
-    image_paths = get_image_paths()
-
-    if not image_paths:
-        print("Nessuna immagine trovata.")
-        return
-
-    for path in image_paths:
-        # 1. Carica l'immagine dal percorso
-        img_originale = cv2.imread(path)
-
-        # Controllo di sicurezza: se l'immagine è corrotta o il percorso è sbagliato
-        if img_originale is None:
-            print(f"Errore: Impossibile caricare {path}")
-            continue
-
-        # 2. Chiama la funzione UNA sola volta
-        # La funzione restituisce 4 valori, dobbiamo prenderli tutti
-        is_rect, score, verts, debug_img = is_rectangle_like(img_originale, area_ratio_threshold=0.9)
-
-        # 3. Stampa i risultati
-        print(f"\nFile: {os.path.basename(path)}")
-        print(f" -> È un rettangolo? {is_rect}")
-        print(f" -> Punteggio (Ratio): {score:.2f}")  # Arrotondamento a 2 decimali
-        print(f" -> Numero vertici: {verts}")
-
-# --- JOB 2: RICONOSCIMENTO COLORI ---
-def job_colors():
-    print("--- AVVIO ANALISI COLORI ---")
-
-    image_paths = get_image_paths()
-
-    if not image_paths:
-        print(f"Nessuna immagine trovata in: {folder}")
-        return
-
-    for path in image_paths:
-        print(f"\nAnalisi file: {os.path.basename(path)}")
-        try:
-            palette = get_dominant_colors(path, k=3)
-
-            print("Top 3 Colori dominanti:")
-            for item in palette:
-                # Stampa del colore, percentuale e codice RGB
-                print(f"  -> {item['percentage']}% : {item['name']} ({item['hex']})")
-
-        except Exception as e:
-            print(f"Errore su questa immagine: {e}")
-
+def b7(id,img_corrected):
+    rect=is_rectangle_like(img_corrected)
+    simmetria=simmetria_check(data,id)
+    wtf=WindowToFacadeRatio(data,id)
+    vhl=vertical_horizontal_lines(data,id)
+    T=negozi(data,id)
+    N=street_art(data,id)
+    O=0.5*simmetria+0.5*int(rect)
+    C=0.2*vhl+0.8*wtf
+    VisR=0.3*O+0.2*C+0.3*T+0.2*N
+    return(VisR)
+    
+def b11(img_corrected):
+    rect=is_rectangle_like(img_corrected)
+    colors=get_dominant_colors(img_corrected)
+    res=0.5*rect+0.5*colors
+    return(res)
 if __name__ == "__main__":
+    print("Inserisci l'id dell'immagine che vuoi analizzare:")
+    id=int(input())
+    im=data.getnamefromid(id)
+    path_img=folder / im
+    img_corrected=Prospettiva(path_img)
+    res1=b7(id,img_corrected)
+    res2=b11(img_corrected)
+    b10=((res1+res2)/2)*100
+    print(b10)
     # riconoscmento forme
-    job_shapes()
+    #job_shapes()
 
     #riconoscimento colori
-    job_colors()
+    #job_colors()
