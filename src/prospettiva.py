@@ -56,6 +56,7 @@ def Correggi_prospettiva(path_img, out_width=None, out_height=None):
     H = T @ M
 
     warped_full = cv2.warpPerspective(img, H, (new_w, new_h))
+
     return warped_full
 
 def seleziona_poligono(img_bgr, window_name="Seleziona poligono"):
@@ -131,11 +132,12 @@ def Prospettiva(path):
     warped=Correggi_prospettiva(path)
     test=Maschera_poligono(warped)
     cv2.imwrite("Img_corrected.png", test)
+    cv2.imwrite("Img_warped.png", warped)
     return test
 
 if __name__ == "__main__":
-    path =  "C:/Users/marco/OneDrive/Desktop/dataset palazzi/IMG_5429.jpeg"
+    path =  "C:/Users/marco/Downloads/testimg4.jpg"
     warped=Correggi_prospettiva(path)
     test=Maschera_poligono(warped)
-    cv2.imwrite("Img_corrected.png", test)
+    cv2.imwrite("testimg3.png", test)
     

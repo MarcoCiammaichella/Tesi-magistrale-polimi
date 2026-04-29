@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-def is_rectangle_like(img, area_ratio_threshold=0.9, debug=False):
+def is_rectangle_like(img, area_ratio_threshold=0.95, debug=False):
     # mask: immagine binaria 0/255 con zona di interesse in bianco
     mask_rosso = np.all(img == [0, 0, 255], axis=2).astype(np.uint8) * 255
     mask = cv2.bitwise_not(mask_rosso)

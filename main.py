@@ -30,7 +30,6 @@ def b7(id,img_corrected):
     color_var = 0
     if distanza <= 150:
         color_var = 1
-    print(distanza)
     rect=is_rectangle_like(img_corrected)
     #print('Is rectangle like?', rect)
     simmetria=simmetria_check(data,id)
@@ -51,6 +50,7 @@ def b7(id,img_corrected):
     
 def b11(img_corrected):
     rect=is_rectangle_like(img_corrected)
+    print(rect)
     colors,distanza=get_dominant_colors(img_corrected)
     res=0.5*rect+0.5*colors
     return(res)
@@ -90,6 +90,7 @@ def plot_performance_gauge(valore):
     plt.tight_layout()
     plt.show()
 if __name__ == "__main__":
+    data.info()
     print("Inserisci l'id dell'immagine che vuoi analizzare:")
     id=int(input())
     im=data.getnamefromid(id)
@@ -97,10 +98,6 @@ if __name__ == "__main__":
     img_corrected=Prospettiva(path_img)
     res1=b7(id,img_corrected)
     res2=b11(img_corrected)
-    b10=((res1+res2)/2)*100
-    plot_performance_gauge(b10)
-    # riconoscmento forme
-    #job_shapes()
-
-    #riconoscimento colori
-    #job_colors()
+    print(res1,res2)
+    #b10=((res1+res2)/2)*100
+    #plot_performance_gauge(b10)
